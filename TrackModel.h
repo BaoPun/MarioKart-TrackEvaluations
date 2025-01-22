@@ -12,6 +12,7 @@ class TrackModel : public QStringListModel{
 Q_OBJECT
 private:
     QVector<Track*> tracks;
+    int total_races;
 
 protected:
     //QModelIndexList match(const QModelIndex&, int, const QVariant&, int = 1, Qt::MatchFlags = Qt::MatchStartsWith) const override;
@@ -35,6 +36,7 @@ public:
     void add_placement_to_track(int, int);
     Track* get_best_track() const;
     Track* get_worst_track() const;
+    int get_total_races() const;
 };
 
 #endif // TRACKMODEL_H

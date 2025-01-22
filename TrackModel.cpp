@@ -1,6 +1,6 @@
 #include "TrackModel.h"
 
-TrackModel::TrackModel(QString file, QObject *parent) : QStringListModel(parent){
+TrackModel::TrackModel(QString file, QObject *parent) : QStringListModel(parent), total_races(0){
     // Initialize all 96 tracks
     int id = 1;
     this->tracks.push_back(new Track("Mario Kart Stadium","MKS", id++));
@@ -117,7 +117,7 @@ TrackModel::TrackModel(QString file, QObject *parent) : QStringListModel(parent)
         // Each part of a line consists of [code, N (# of placements entered), N remaining placements]
         QStringList line_components = line.split(',');
         for(size_t j = 2; j < line_components.size(); j++){
-            this->tracks.at(i)->add_placement(line_components.at(j).toInt());
+            this->add_placement_to_track(i, line_components.at(j).toInt());
         }
     }
 
@@ -189,10 +189,12 @@ Track* TrackModel::get_track_by_id(int idx) const{
  */
 void TrackModel::add_placement_to_track(int track_idx, int placement){
     this->tracks.at(track_idx)->add_placement(placement);
+    ++this->total_races;
 }
 
 /**
- * @brief Returns the best performing track, determined by the lowest average placement
+ * @brief Returns the best performing track, determined by the lowest average placement.
+ * But, tracks with larger sample sizes with slightly lower average than tracks with smaller samples will take priority by a factor of +- 0.25.
  * @return a pointer to the best track, or null if all tracks' averages are 0.
  */
 Track* TrackModel::get_best_track() const{
@@ -205,7 +207,7 @@ Track* TrackModel::get_best_track() const{
                 best = this->tracks.at(i);
                 best_score = this->tracks.at(i)->get_average_placement();
             }
-            else if(best_score > this->tracks.at(i)->get_average_placement()){
+            else if(best_score > this->tracks.at(i)->get_average_placement() || (this->tracks.at(i)->get_all_placements().size() > best->get_all_placements().size() && this->tracks.at(i)->get_average_placement() - best_score <= 0.25)){
                 best = this->tracks.at(i);
                 best_score = this->tracks.at(i)->get_average_placement();
             }
@@ -216,7 +218,8 @@ Track* TrackModel::get_best_track() const{
 }
 
 /**
- * @brief Returns the worst performing track, determined by the highest average placement
+ * @brief Returns the worst performing track, determined by the highest average placement.
+ * But, tracks with larger sample sizes with slightly higher average than tracks with smaller samples will take priority by a factor of +- 0.5.
  * @return a pointer to the worst track, or null if all tracks' averages are 0.
  */
 Track* TrackModel::get_worst_track() const{
@@ -229,7 +232,7 @@ Track* TrackModel::get_worst_track() const{
                 worst = this->tracks.at(i);
                 worst_score = this->tracks.at(i)->get_average_placement();
             }
-            else if(worst_score < this->tracks.at(i)->get_average_placement()){
+            else if(worst_score < this->tracks.at(i)->get_average_placement()  || (this->tracks.at(i)->get_all_placements().size() > worst->get_all_placements().size() && worst_score - this->tracks.at(i)->get_average_placement() <= 0.5)){
                 worst = this->tracks.at(i);
                 worst_score = this->tracks.at(i)->get_average_placement();
             }
@@ -237,4 +240,12 @@ Track* TrackModel::get_worst_track() const{
     }
 
     return worst;
+}
+
+/**
+ * @brief Returns the total # of races for all 96 tracks.
+ * @return sum of all races.
+ */
+int TrackModel::get_total_races() const{
+    return this->total_races;
 }

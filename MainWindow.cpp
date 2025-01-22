@@ -19,6 +19,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->ui->score_input->setVisible(false);
     this->ui->track_info->setVisible(false);
 
+    // Hide scrollbars from text browser
+    this->ui->overall_info->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->ui->overall_info->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     // Create the track listing
     QStringList matches;
     for(size_t i = 0; i < this->tracks->get_tracks().size(); i++)
@@ -257,8 +261,9 @@ void MainWindow::update_overall_info(){
     else
         this->ui->overall_info->setText("Best track: " + best->get_verbose() +
                                         "\nWorst track: " + worst->get_verbose() +
-                                        "\n\nBest average: " + QString::number(best->get_average_placement()) + " - " + QString::number(best->get_all_placements().size()) + " race(s)."
-                                        "\nWorst average: " + QString::number(worst->get_average_placement()) + " - " + QString::number(worst->get_all_placements().size()) + " race(s)."
+                                        "\n\nBest average: " + QString::number(best->get_average_placement()) + " - " + QString::number(best->get_all_placements().size()) + " race(s)." +
+                                        "\nWorst average: " + QString::number(worst->get_average_placement()) + " - " + QString::number(worst->get_all_placements().size()) + " race(s)." +
+                                        "\n\nTotal races: " + QString::number(this->tracks->get_total_races())
                                     );
 }
 
