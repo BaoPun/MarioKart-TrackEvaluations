@@ -254,6 +254,7 @@ void MainWindow::add_placement_to_track(){
 void MainWindow::update_overall_info(){
     Track* best = this->tracks->get_best_track();
     Track* worst = this->tracks->get_worst_track();
+    Track* mode = this->tracks->get_most_played_track();
 
     // Update the overall info
     if(best == nullptr || worst == nullptr)
@@ -261,8 +262,7 @@ void MainWindow::update_overall_info(){
     else
         this->ui->overall_info->setText("Best track: " + best->get_verbose() +
                                         "\nWorst track: " + worst->get_verbose() +
-                                        "\n\nBest average: " + QString::number(best->get_average_placement()) + " - " + QString::number(best->get_all_placements().size()) + " race(s)." +
-                                        "\nWorst average: " + QString::number(worst->get_average_placement()) + " - " + QString::number(worst->get_all_placements().size()) + " race(s)." +
+                                        "\n\nMost played:\n" + (mode == nullptr ? "No data" : mode->get_verbose() + " (" + QString::number(mode->get_all_placements().size()) + " times)") +
                                         "\n\nTotal races: " + QString::number(this->tracks->get_total_races())
                                     );
 }

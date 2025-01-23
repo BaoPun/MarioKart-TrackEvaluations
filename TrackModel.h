@@ -37,6 +37,7 @@ public:
     Track* get_best_track() const;
     Track* get_worst_track() const;
     int get_total_races() const;
+    Track* get_most_played_track() const;
 };
 
 #endif // TRACKMODEL_H

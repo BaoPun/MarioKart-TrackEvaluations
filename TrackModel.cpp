@@ -207,7 +207,7 @@ Track* TrackModel::get_best_track() const{
                 best = this->tracks.at(i);
                 best_score = this->tracks.at(i)->get_average_placement();
             }
-            else if(best_score > this->tracks.at(i)->get_average_placement() || (this->tracks.at(i)->get_all_placements().size() > best->get_all_placements().size() && this->tracks.at(i)->get_average_placement() - best_score <= 0.25)){
+            else if((this->tracks.at(i)->get_all_placements().size() > best->get_all_placements().size() && this->tracks.at(i)->get_average_placement() - best_score <= 0.5) || best_score > this->tracks.at(i)->get_average_placement()){
                 best = this->tracks.at(i);
                 best_score = this->tracks.at(i)->get_average_placement();
             }
@@ -232,7 +232,7 @@ Track* TrackModel::get_worst_track() const{
                 worst = this->tracks.at(i);
                 worst_score = this->tracks.at(i)->get_average_placement();
             }
-            else if(worst_score < this->tracks.at(i)->get_average_placement()  || (this->tracks.at(i)->get_all_placements().size() > worst->get_all_placements().size() && worst_score - this->tracks.at(i)->get_average_placement() <= 0.5)){
+            else if((this->tracks.at(i)->get_all_placements().size() > worst->get_all_placements().size() && worst_score - this->tracks.at(i)->get_average_placement() <= 0.5) || worst_score < this->tracks.at(i)->get_average_placement()){
                 worst = this->tracks.at(i);
                 worst_score = this->tracks.at(i)->get_average_placement();
             }
@@ -248,4 +248,22 @@ Track* TrackModel::get_worst_track() const{
  */
 int TrackModel::get_total_races() const{
     return this->total_races;
+}
+
+/**
+ * @brief Returns the track that is most played, or null if none of the tracks have been played.
+ * @return track that is most played, or nullptr if none have been played at all.
+ */
+Track* TrackModel::get_most_played_track() const{
+    Track* most_played = this->tracks.at(0);
+    int most_played_count = most_played->get_all_placements().size();
+
+    for(size_t i = 1; i < this->tracks.size(); i++){
+        if(most_played_count < this->tracks.at(i)->get_all_placements().size()){
+            most_played = this->tracks.at(i);
+            most_played_count = most_played->get_all_placements().size();
+        }
+    }
+
+    return (most_played_count > 0 ? most_played : nullptr);
 }
