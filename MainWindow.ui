@@ -118,6 +118,19 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="frequency_button">
+    <property name="geometry">
+     <rect>
+      <x>599</x>
+      <y>400</y>
+      <width>171</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show Frequency Graph</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

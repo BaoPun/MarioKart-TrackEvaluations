@@ -42,6 +42,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // For the overall track info, always show the best and worst
     this->update_overall_info();
 
+    // TODO: at the start, show a BAR graph of the frequency of each placements
+    this->bar_graph = nullptr;
+    this->show_frequency_graph();
+
     // When we press enter on the completer, set to readonly
     this->connect(this->ui->track_search_bar->completer(), SIGNAL(activated(QString)), this, SLOT(selected_track()), Qt::QueuedConnection);
 
@@ -59,6 +63,10 @@ MainWindow::~MainWindow(){
     if(this->track_image != nullptr){
         delete this->track_image;
         this->track_image = nullptr;
+    }
+    if(this->bar_graph != nullptr){
+        delete this->bar_graph;
+        this->bar_graph = nullptr;
     }
     if(this->tracks != nullptr){
         delete this->tracks;
@@ -115,10 +123,8 @@ void MainWindow::load_graph(Track* found_track){
         line_series->append(i+1, placements.at(i));
     }
     line_series->setPointsVisible(true);
-    chart->setTitle("Scores for " + found_track->get_verbose());
+    chart->setTitle("<b>Scores for " + found_track->get_verbose() + "</b>");
     chart->addSeries(line_series);
-
-
 
     // Add axes manually
     QValueAxis* x_axis = new QValueAxis();
@@ -147,6 +153,14 @@ void MainWindow::load_graph(Track* found_track){
                                   + "\n\nTotal races: " + QString::number(placements.size())
                                   + "\nAverage placement: " + QString::number(this->tracks->get_track_by_id(this->track_nbr)->get_average_placement(), 'f', 2)
     );
+
+    // Make the frequency button visible, if not already visible
+    if(!this->ui->frequency_button->isVisible()){
+        this->ui->frequency_button->show();
+
+        // Add a connection to show frequency graph
+        this->connect(this->ui->frequency_button, SIGNAL(clicked()), this, SLOT(show_frequency_graph()), Qt::UniqueConnection);
+    }
 }
 
 /**
@@ -164,9 +178,13 @@ void MainWindow::process_track_input(){
         qDebug() << "Placement average:" << found_track->get_average_placement();
 
         // Find corresponding image from found track and load it into the frame. (via course code)
+        if(this->bar_graph != nullptr){
+            this->ui->data_layout->removeWidget(this->bar_graph);
+            delete this->bar_graph;
+            this->bar_graph = nullptr;
+        }
         this->load_image(found_track);
         this->load_graph(found_track);
-
     }
     else{
         found_track = this->tracks->get_track_by_input(this->ui->track_search_bar->text());
@@ -267,6 +285,69 @@ void MainWindow::update_overall_info(){
                                         "\nAverage overall placement: " + QString::number(this->tracks->get_overall_average_placement(), 'f', 2) +
                                         "\nAverage points per mogi: " + QString::number(this->tracks->get_average_points(), 'f', 2)
                                     );
+}
+
+/**
+ * @brief Only when a track has not been selected; show a bar graph of all placements
+ */
+void MainWindow::show_frequency_graph(){
+    // First, if a track is selected, then remove both its image and its graph
+    if(this->line_graph != nullptr){
+        this->ui->data_layout->removeWidget(this->line_graph);
+        delete this->line_graph;
+        this->line_graph = nullptr;
+    }
+    if(this->track_image != nullptr){
+        this->ui->data_layout->removeWidget(this->track_image);
+        delete this->track_image;
+        this->track_image = nullptr;
+    }
+
+    // Then, allocate a brand new bar graph
+    QBarSet* dataset = new QBarSet("Placements");
+    QVector<Track*> all_tracks = this->tracks->get_tracks();
+    QBarSeries* bar_series = new QBarSeries();
+    QChart* chart = new QChart();
+
+    // Retrieve all placement data from all tracks.
+    for(size_t i = 0; i < all_tracks.size(); i++){
+        for(size_t j = 0; j < all_tracks.at(i)->get_all_placements().size(); j++)
+            *dataset << all_tracks.at(i)->get_all_placements().at(j);
+    }
+
+    // Add the data to the bar series
+    bar_series->append(dataset);
+
+    // Now add the bar series to the chart, where we can customize the axes, title, etc.
+    chart->addSeries(bar_series);
+    chart->setTitle("<b>Frequencies of Placement Results 1-12</b>");
+
+    // Create an X axis to customize the bins
+    QBarCategoryAxis* x_axis = new QBarCategoryAxis();
+    x_axis->append({"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"});
+    x_axis->setTitleText("Placements");
+    chart->addAxis(x_axis, Qt::AlignBottom);
+    bar_series->attachAxis(x_axis);
+
+    // Create a y axis to show the column values
+    QValueAxis* y_axis = new QValueAxis();
+    chart->addAxis(y_axis, Qt::AlignLeft);
+    bar_series->attachAxis(y_axis);
+
+    // Hide the legend
+    chart->legend()->hide();
+
+    // Finally, create the bar graph viewer
+    this->bar_graph = new QChartView(chart);
+    this->bar_graph->setRenderHint(QPainter::Antialiasing);
+    this->ui->data_layout->addWidget(this->bar_graph);
+
+    // Hide the frequency graph button, as it will not be visible as long as the graph is already shown
+    this->ui->frequency_button->hide();
+
+    // And also hide the score inputs and display
+    this->ui->score_input->setVisible(false);
+    this->ui->track_info->setVisible(false);
 }
 
 /**

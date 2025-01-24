@@ -8,6 +8,9 @@
 #include <QLabel>
 #include <QLayout>
 #include <QtCharts>
+#include <QBarSet>
+#include <QBarSeries>
+#include <QBarCategoryAxis>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,11 +23,13 @@ Q_OBJECT
 private:
     Ui::MainWindow *ui;
     TrackModel* tracks;
-    //TrackSearchModel* proxy;
-    QChartView* line_graph;
 
     // Store the current label
     QLabel* track_image;
+    QChartView* line_graph;
+
+    // Store a bar graph of all the different placements
+    QChartView* bar_graph;
 
     bool track_selected_dropdown = false;
 
@@ -37,6 +42,7 @@ private:
     void save_configuration();
     void add_placement_to_track();
     void update_overall_info();
+    //void show_frequency_graph();
 
     int track_nbr = -1;
 
@@ -46,6 +52,7 @@ protected:
 private slots:
     //void search_changed(QString);
     void selected_track(/*QModelIndex*/);
+    void show_frequency_graph();
 
 public:
     MainWindow(QWidget *parent = nullptr);
