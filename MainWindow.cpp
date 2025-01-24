@@ -310,9 +310,20 @@ void MainWindow::show_frequency_graph(){
     QChart* chart = new QChart();
 
     // Retrieve all placement data from all tracks.
+    QMap<int, int> frequency;
     for(size_t i = 0; i < all_tracks.size(); i++){
-        for(size_t j = 0; j < all_tracks.at(i)->get_all_placements().size(); j++)
-            *dataset << all_tracks.at(i)->get_all_placements().at(j);
+        for(size_t j = 0; j < all_tracks.at(i)->get_all_placements().size(); j++){
+            frequency[all_tracks.at(i)->get_all_placements().at(j)]++;
+        }
+    }
+
+    // With all the placement data into a map, add each to the dataset.
+    // Also store which has the largest count
+    int largest_frequency = -1;
+    for(int i = 1; i <= 12; i++){
+        *dataset << frequency[i];
+        if(largest_frequency < frequency[i])
+            largest_frequency = frequency[i];
     }
 
     // Add the data to the bar series
@@ -341,6 +352,9 @@ void MainWindow::show_frequency_graph(){
     this->bar_graph = new QChartView(chart);
     this->bar_graph->setRenderHint(QPainter::Antialiasing);
     this->ui->data_layout->addWidget(this->bar_graph);
+
+    // TODO: add values to each bar
+    bar_series->setLabelsVisible(true);
 
     // Hide the frequency graph button, as it will not be visible as long as the graph is already shown
     this->ui->frequency_button->hide();
