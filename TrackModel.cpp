@@ -267,3 +267,48 @@ Track* TrackModel::get_most_played_track() const{
 
     return (most_played_count > 0 ? most_played : nullptr);
 }
+
+/**
+ * @brief Returns the overall average placement across every single race
+ * @return average of all races
+ */
+double TrackModel::get_overall_average_placement() const{
+    int sum = 0;
+    int length = 0;
+    for(size_t i = 0; i < this->tracks.size(); i++){
+        for(size_t j = 0; j < this->tracks.at(i)->get_all_placements().size(); j++)
+            sum += this->tracks.at(i)->get_all_placements().at(j);
+        length += this->tracks.at(i)->get_all_placements().size();
+    }
+    return sum * 1.0 / length;
+}
+
+/**
+ * @brief Returns the average points earned per race.  (1st place = 15, 12th place = 1, for example)
+ * @return average points
+ */
+double TrackModel::get_average_points() const{
+    int sum = 0;
+    int length = 0;
+    for(size_t i = 0; i < this->tracks.size(); i++){
+        for(size_t j = 0; j < this->tracks.at(i)->get_all_placements().size(); j++){
+            switch(this->tracks.at(i)->get_all_placements().at(j)){
+                case 1: sum += 15; break;
+                case 2: sum += 12; break;
+                case 3: sum += 10; break;
+                case 4: sum += 9; break;
+                case 5: sum += 8; break;
+                case 6: sum += 7; break;
+                case 7: sum += 6; break;
+                case 8: sum += 5; break;
+                case 9: sum += 4; break;
+                case 10: sum += 3; break;
+                case 11: sum += 2; break;
+                case 12: sum++; break;
+                default: break;
+            }
+        }
+        length += this->tracks.at(i)->get_all_placements().size();
+    }
+    return sum * 1.0 / (length / 12);   // each mogi = 12 races
+}

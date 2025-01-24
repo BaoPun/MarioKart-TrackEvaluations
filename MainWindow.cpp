@@ -144,8 +144,8 @@ void MainWindow::load_graph(Track* found_track){
     // Update the track_info display
     this->ui->track_info->setVisible(true);
     this->ui->track_info->setText(this->tracks->get_track_by_id(this->track_nbr)->get_verbose()
-                                  + "\n\n\nTotal races: " + QString::number(placements.size())
-                                  + "\nAverage placement: " + QString::number(this->tracks->get_track_by_id(this->track_nbr)->get_average_placement())
+                                  + "\n\nTotal races: " + QString::number(placements.size())
+                                  + "\nAverage placement: " + QString::number(this->tracks->get_track_by_id(this->track_nbr)->get_average_placement(), 'f', 2)
     );
 }
 
@@ -263,7 +263,9 @@ void MainWindow::update_overall_info(){
         this->ui->overall_info->setText("Best track: " + best->get_verbose() +
                                         "\nWorst track: " + worst->get_verbose() +
                                         "\n\nMost played:\n" + (mode == nullptr ? "No data" : mode->get_verbose() + " (" + QString::number(mode->get_all_placements().size()) + " times)") +
-                                        "\n\nTotal races: " + QString::number(this->tracks->get_total_races())
+                                        "\n\nTotal races: " + QString::number(this->tracks->get_total_races()) +
+                                        "\nAverage overall placement: " + QString::number(this->tracks->get_overall_average_placement(), 'f', 2) +
+                                        "\nAverage points per mogi: " + QString::number(this->tracks->get_average_points(), 'f', 2)
                                     );
 }
 

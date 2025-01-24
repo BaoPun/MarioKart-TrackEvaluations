@@ -38,6 +38,8 @@ public:
     Track* get_worst_track() const;
     int get_total_races() const;
     Track* get_most_played_track() const;
+    double get_overall_average_placement() const;
+    double get_average_points() const;
 };
 
 #endif // TRACKMODEL_H
