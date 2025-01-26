@@ -40,6 +40,7 @@ public:
     Track* get_most_played_track() const;
     double get_overall_average_placement() const;
     double get_average_points() const;
+    double get_top_percentage(int = 3) const;
 };
 
 #endif // TRACKMODEL_H

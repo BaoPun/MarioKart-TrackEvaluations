@@ -289,7 +289,6 @@ double TrackModel::get_overall_average_placement() const{
  */
 double TrackModel::get_average_points() const{
     int sum = 0;
-    int length = 0;
     for(size_t i = 0; i < this->tracks.size(); i++){
         for(size_t j = 0; j < this->tracks.at(i)->get_all_placements().size(); j++){
             switch(this->tracks.at(i)->get_all_placements().at(j)){
@@ -308,7 +307,21 @@ double TrackModel::get_average_points() const{
                 default: break;
             }
         }
-        length += this->tracks.at(i)->get_all_placements().size();
     }
-    return sum * 1.0 / (length / 12);   // each mogi = 12 races
+    return sum * 1.0 / (this->total_races / 12);   // each mogi = 12 races
+}
+
+/**
+ * @brief Return the percentage of races that we have placed in the top 3
+ * @return Percentage of top 3 placements
+ */
+double TrackModel::get_top_percentage(int threshold) const{
+    int sum = 0;
+    for(size_t i = 0; i < this->tracks.size(); i++){
+        for(size_t j = 0; j < this->tracks.at(i)->get_all_placements().size(); j++){
+            if(this->tracks.at(i)->get_all_placements().at(j) <= threshold)
+                ++sum;
+        }
+    }
+    return sum * 1.0 / this->total_races * 100.;
 }

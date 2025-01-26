@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Create the track listing
     QStringList matches;
     for(size_t i = 0; i < this->tracks->get_tracks().size(); i++)
-        matches.append(this->tracks->get_tracks().at(i)->get_verbose() + "\t" + this->tracks->get_tracks().at(i)->get_abbreviation());
+        matches.append(this->tracks->get_tracks().at(i)->get_verbose().leftJustified(50) + "\t" + this->tracks->get_tracks().at(i)->get_abbreviation());
     this->tracks->setStringList(std::move(matches));
 
     // Programmatically add dropdown options to the search bar
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // For the overall track info, always show the best and worst
     this->update_overall_info();
 
-    // TODO: at the start, show a BAR graph of the frequency of each placements
+    // At the start, show a BAR graph of the frequency of each placements
     this->bar_graph = nullptr;
     this->show_frequency_graph();
 
@@ -172,7 +172,8 @@ void MainWindow::process_track_input(){
     // If the track was selected via dropdown, then this is ALWAYS valid.
     Track* found_track = nullptr;
     if(this->track_selected_dropdown){
-        // Before finding the track, splice by the "\t" character
+        // Before finding the track, spliced by the "\t" character
+        // Update: now spliced by index 50
         int idx = this->ui->track_search_bar->text().toStdString().find('\t') + 1;
         found_track = this->tracks->get_track_by_input(QString::fromStdString(this->ui->track_search_bar->text().toStdString().substr(idx)));
         qDebug() << "Placement average:" << found_track->get_average_placement();
@@ -278,12 +279,12 @@ void MainWindow::update_overall_info(){
     if(best == nullptr || worst == nullptr)
         this->ui->overall_info->setText("No data.");
     else
-        this->ui->overall_info->setText("Best track: " + best->get_verbose() +
-                                        "\nWorst track: " + worst->get_verbose() +
+        this->ui->overall_info->setText("Best   : " + best->get_verbose() +
+                                        "\nWorst: " + worst->get_verbose() +
                                         "\n\nMost played:\n" + (mode == nullptr ? "No data" : mode->get_verbose() + " (" + QString::number(mode->get_all_placements().size()) + " times)") +
                                         "\n\nTotal races: " + QString::number(this->tracks->get_total_races()) +
-                                        "\nAverage overall placement: " + QString::number(this->tracks->get_overall_average_placement(), 'f', 2) +
-                                        "\nAverage points per mogi: " + QString::number(this->tracks->get_average_points(), 'f', 2)
+                                        "\nAverage % podium finish: " + QString::number(this->tracks->get_top_percentage(), 'f', 2) + "%" +
+                                        "\nAverage % top half finish: " + QString::number(this->tracks->get_top_percentage(6), 'f', 2) + "%"
                                     );
 }
 
