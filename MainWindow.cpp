@@ -79,6 +79,8 @@ MainWindow::~MainWindow(){
         delete this->ui;
         this->ui = nullptr;
     }
+
+    qDebug() << "Application successfully closed." << Qt::endl;
 }
 
 /**
