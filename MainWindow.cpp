@@ -80,7 +80,7 @@ MainWindow::~MainWindow(){
         this->ui = nullptr;
     }
 
-    qDebug() << "Application successfully closed." << Qt::endl;
+    qDebug() << "Application successfully closed.  Test worked." << Qt::endl;
 }
 
 /**
