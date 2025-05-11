@@ -53,6 +53,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->ui->centralwidget->installEventFilter(this);
     this->ui->track_search_bar->installEventFilter(this);
     this->ui->score_input->installEventFilter(this);
+
+    // Test branch: print out some message
+    qDebug() << "Testing message" << Qt::endl;
 }
 
 MainWindow::~MainWindow(){
